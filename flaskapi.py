@@ -71,3 +71,80 @@ def get_users():
         return resp
     except Exception as exception:
         return jsonify(str(exception))
+
+
+@app.route('/user/<int::user_id>', methods=['GET'])
+def get_user(user_id):
+    """
+    Function to get information of a specific user in the MySQL database
+    :param user_id:
+    :return:
+    """
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_id=%s", user_id)
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as exception:
+        return jsonify(str(exception))
+
+
+@app.route('/update', methods=['POST'])
+def update_user():
+    """
+    Function to update a user in the MYSQL database
+    :return:
+    """
+    json = request.json
+    name = json['name']
+    email = json['email']
+    password = json['password']
+    user_id = json['user_id']
+    if name and email and password and user_id and request.method == "POST":
+        # save edits to database
+        sql = "UPDATE users SET user_name=%s, user_email=%s, user_password=%s WHERE user_id=%s"
+        data = (name, email, password, user_id)
+        try:
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute(sql, data)
+            conn.commit()
+            resp = jsonify('User updated successfully!')
+            resp.status_code = 200
+            cursor.close()
+            conn.close()
+            return resp
+        except Exception as exception:
+            return jsonify(str(exception))
+    else:
+        return jsonify('Please provide id, name, email and password')
+
+
+@app.route('/delete/<int:user_id>')
+def delete_user(user_id):
+    """
+    Function to delete a user from the MySQL database
+    :param user_id:
+    :return:
+    """
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users WHERE user_id=%s", user_id)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        resp = jsonify('User deleted successfully!')
+        resp.status_code = 200
+        return resp
+    except Exception as exception:
+        return jsonify(str(exception))
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
