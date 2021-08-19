@@ -16,21 +16,21 @@ spec:
         app: db
     spec:
       containers:
-        - name: mysql
-          image: mysql
-          imagePullPolicy: Never
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: flask-secrets
-                  key: db_root_password
-          ports:
-            - containerPort: 3306
-              name: db-container
-          volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
+      - name: mysql
+        image: mysql
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flask-secrets
+              key: db_root_password
+        ports:
+        - containerPort: 3306
+          name: db-container
+        volumeMounts:
+          - name: mysql-persistent-storage
+            mountPath: /var/lib/mysql
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
@@ -46,9 +46,9 @@ metadata:
     app: db
 spec:
   ports:
-    - port: 3306
-      protocol: TCP
-      name: mysql
-    selector:
-      app: db
-    type: NodePort
+  - port: 3306
+    protocol: TCP
+    name: mysql
+  selector:
+    app: db
+  type: NodePort
